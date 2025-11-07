@@ -6,6 +6,7 @@ let currentRoom = new URLSearchParams(window.location.search).get('room') ||
 
 localStorage.setItem('canvas-room', currentRoom);
 
+// Auto-detect WebSocket URL for production
 const getWebSocketURL = () => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
@@ -29,6 +30,22 @@ const cursors = {};
 let lastCursorSend = 0;
 const CURSOR_THROTTLE = 50;
 
+// Drawing activity tracking
+let activityTimeout = null;
+
+// Your profile elements
+const yourProfileEl = document.getElementById('your-profile');
+const yourNameEl = document.getElementById('your-name');
+const renameBtnEl = document.getElementById('rename-btn');
+const drawingActivityEl = document.getElementById('drawing-activity');
+const drawingUserEl = document.getElementById('drawing-user');
+
+// Rename modal elements
+const renameModal = document.getElementById('rename-modal');
+const nameInput = document.getElementById('name-input');
+const saveNameBtn = document.getElementById('save-name-btn');
+const cancelNameBtn = document.getElementById('cancel-name-btn');
+
 function updateRoomDisplay() {
     roomInfoEl.innerHTML = `Room: <strong>${currentRoom}</strong>`;
     document.title = `Collaborative Canvas - ${currentRoom}`;
@@ -41,7 +58,7 @@ const changeRoomBtn = document.getElementById('change-room');
 const joinRoomBtn = document.getElementById('join-room-btn');
 const cancelRoomBtn = document.getElementById('cancel-room-btn');
 
-// ✅ NEW: Exit button functionality
+// Exit button functionality
 const exitRoomBtn = document.getElementById('exit-room');
 const exitModal = document.getElementById('exit-modal');
 const confirmExitBtn = document.getElementById('confirm-exit-btn');
@@ -56,13 +73,9 @@ cancelExitBtn.addEventListener('click', () => {
 });
 
 confirmExitBtn.addEventListener('click', () => {
-    // Save current state
     drawer.saveRoomState(currentRoom);
-    
-    // Close WebSocket connection
     ws.close();
     
-    // Show exit message
     document.body.innerHTML = `
         <div style="
             display: flex;
@@ -94,6 +107,73 @@ confirmExitBtn.addEventListener('click', () => {
         </div>
     `;
 });
+
+// Rename button handler
+renameBtnEl.addEventListener('click', () => {
+    renameModal.classList.remove('hidden');
+    nameInput.value = users[userId]?.name || '';
+    nameInput.focus();
+});
+
+cancelNameBtn.addEventListener('click', () => {
+    renameModal.classList.add('hidden');
+});
+
+saveNameBtn.addEventListener('click', () => {
+    const newName = nameInput.value.trim();
+    if (newName.length >= 3 && newName.length <= 20) {
+        if (users[userId]) {
+            users[userId].name = newName;
+        }
+        
+        if (userId && ws.isReady()) {
+            ws.send('rename-user', { 
+                userId, 
+                roomId: currentRoom, 
+                newName 
+            });
+        }
+        
+        updateYourProfile();
+        updateUsersUI();
+        
+        renameModal.classList.add('hidden');
+        showNotification(`Your name changed to: ${newName}`, users[userId]?.color || '#0f0');
+    } else {
+        alert('Name must be 3-20 characters!');
+    }
+});
+
+nameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        saveNameBtn.click();
+    }
+});
+
+// Update your profile badge
+function updateYourProfile() {
+    if (userId && users[userId]) {
+        const user = users[userId];
+        yourNameEl.innerHTML = `You: <strong>${user.name}</strong>`;
+        yourProfileEl.style.borderColor = user.color;
+        yourProfileEl.style.background = `linear-gradient(135deg, rgba(0,0,0,0.9), ${user.color}22)`;
+    }
+}
+
+// Show drawing activity
+function showDrawingActivity(drawingUserId) {
+    if (!users[drawingUserId] || drawingUserId === userId) return;
+    
+    const user = users[drawingUserId];
+    drawingUserEl.textContent = user.name;
+    drawingUserEl.style.color = user.color;
+    drawingActivityEl.classList.remove('hidden');
+    
+    clearTimeout(activityTimeout);
+    activityTimeout = setTimeout(() => {
+        drawingActivityEl.classList.add('hidden');
+    }, 2000);
+}
 
 changeRoomBtn.addEventListener('click', () => {
     roomModal.classList.remove('hidden');
@@ -169,6 +249,7 @@ ws.on('init', (msg) => {
     userId = msg.userId;
     users = msg.users || {};
     updateUsersUI();
+    updateYourProfile();
 });
 
 ws.on('user-joined', (msg) => {
@@ -192,6 +273,28 @@ ws.on('user-left', (msg) => {
     drawer.redraw();
     
     console.log('Remaining users:', Object.keys(users).length);
+});
+
+// Handle name change from other users
+ws.on('user-renamed', (msg) => {
+    if (users[msg.userId]) {
+        const oldName = users[msg.userId].name;
+        users[msg.userId].name = msg.newName;
+        updateUsersUI();
+        
+        if (msg.userId === userId) {
+            updateYourProfile();
+        }
+        
+        showNotification(`${oldName} is now ${msg.newName}`, users[msg.userId].color);
+    }
+});
+
+// Handle drawing activity
+ws.on('drawing-start', (msg) => {
+    if (msg.userId !== userId) {
+        showDrawingActivity(msg.userId);
+    }
 });
 
 ws.on('draw-path', (msg) => {
@@ -329,6 +432,8 @@ drawer.endDraw = function() {
         this.saveRoomState(currentRoom);
         
         if (userId && ws.isReady()) {
+            // Notify others you're drawing
+            ws.send('drawing-start', { userId, roomId: currentRoom });
             ws.send('draw-path', { path: completedPath, userId, roomId: currentRoom });
         }
     }

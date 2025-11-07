@@ -9,22 +9,26 @@ body {
     background: #222;
     color: #fff;
     text-align: center;
-    padding-bottom: 50px;
+    padding-bottom: 20px;
+    overflow-x: hidden;
 }
 
 h1 {
-    margin: 20px 0 10px 0;
-    font-size: 2rem;
+    margin: 15px 0 8px 0;
+    font-size: 1.8rem;
 }
 
+/* Room Info */
 #room-info {
-    margin: 10px auto;
-    padding: 10px 20px;
+    margin: 8px auto;
+    padding: 8px 16px;
     background: rgba(51, 51, 51, 0.8);
     border-radius: 8px;
     display: inline-flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 #current-room {
@@ -36,7 +40,7 @@ h1 {
     font-size: 16px;
 }
 
-#change-room {
+#change-room, #exit-room {
     padding: 6px 12px;
     background: #444;
     color: #fff;
@@ -45,20 +49,122 @@ h1 {
     cursor: pointer;
     font-size: 13px;
     transition: all 0.3s;
+    touch-action: manipulation;
 }
 
-#change-room:hover {
+#change-room:hover, #exit-room:hover {
     background: #555;
 }
 
-#stats {
+#change-room:active, #exit-room:active {
+    transform: scale(0.95);
+}
+
+#exit-room {
+    background: #944;
+}
+
+#exit-room:hover {
+    background: #a55;
+}
+
+/* Your Profile Badge (Top Right) */
+#your-profile {
     position: fixed;
     top: 10px;
     right: 10px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid;
+    animation: fadeIn 0.5s ease-in;
+}
+
+#your-name {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#your-name strong {
+    font-size: 14px;
+}
+
+#rename-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    opacity: 0.7;
+}
+
+#rename-btn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Drawing Activity Indicator */
+#drawing-activity {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    z-index: 998;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideDown 0.3s ease-out;
+}
+
+#drawing-activity.hidden {
+    display: none;
+}
+
+#drawing-user {
+    font-weight: bold;
+    color: #32c8c8;
+}
+
+@keyframes slideDown {
+    from { 
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Performance Stats - moved down */
+#stats {
+    position: fixed;
+    top: 60px;
+    right: 10px;
     background: rgba(0, 0, 0, 0.9);
-    padding: 12px 15px;
+    padding: 10px 12px;
     border-radius: 8px;
-    font-size: 12px;
+    font-size: 11px;
     font-family: 'Courier New', monospace;
     z-index: 1000;
     border: 1px solid #333;
@@ -66,17 +172,18 @@ h1 {
 
 #stats span {
     display: block;
-    margin: 4px 0;
+    margin: 3px 0;
     color: #0f0;
 }
 
+/* Connection Status */
 #connection-status {
     position: fixed;
     top: 10px;
     left: 10px;
-    padding: 8px 15px;
+    padding: 6px 12px;
     border-radius: 20px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
     z-index: 1000;
     transition: all 0.3s;
@@ -112,28 +219,29 @@ h1 {
     50% { transform: scale(1.05); }
 }
 
+/* Toolbar */
 #toolbar {
-    margin: 15px auto;
-    padding: 12px;
+    margin: 12px auto;
+    padding: 10px;
     background: #333;
     border-radius: 10px;
-    display: inline-block;
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-}
-
-#toolbar label, #toolbar input, #toolbar button {
-    margin: 0 10px;
-    font-size: 1rem;
-    vertical-align: middle;
+    max-width: 95%;
 }
 
 #toolbar label {
     font-weight: 500;
     color: #ccc;
+    font-size: 0.95rem;
 }
 
 #toolbar button {
-    padding: 10px 18px;
+    padding: 10px 16px;
     background: #555;
     color: #fff;
     border: none;
@@ -141,6 +249,9 @@ h1 {
     cursor: pointer;
     transition: all 0.3s;
     font-weight: 500;
+    font-size: 0.95rem;
+    touch-action: manipulation;
+    min-width: 80px;
 }
 
 #toolbar button:hover {
@@ -151,7 +262,7 @@ h1 {
 
 #toolbar button:active {
     background: #444;
-    transform: translateY(0);
+    transform: translateY(0) scale(0.95);
 }
 
 #toolbar button#eraser {
@@ -170,7 +281,6 @@ h1 {
 
 #toolbar button#clear {
     background: #944;
-    margin-left: 20px;
 }
 
 #toolbar button#clear:hover {
@@ -178,9 +288,9 @@ h1 {
 }
 
 #toolbar input[type="range"] {
-    vertical-align: middle;
     cursor: pointer;
     width: 100px;
+    touch-action: manipulation;
 }
 
 #toolbar input[type="color"] {
@@ -189,33 +299,45 @@ h1 {
     border-radius: 6px;
     height: 36px;
     width: 50px;
+    touch-action: manipulation;
 }
 
+/* Online Users */
 #users {
-    margin: 15px 0;
-    padding: 8px 0;
-    font-size: 1.1em;
+    margin: 12px 0;
+    padding: 8px;
+    font-size: 1em;
+    word-wrap: break-word;
+    max-width: 95%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #users span {
-    padding: 6px 12px;
+    padding: 5px 10px;
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.1);
-    margin: 0 6px;
+    margin: 4px;
     display: inline-block;
     font-weight: 500;
+    font-size: 0.9em;
 }
 
+/* Canvas */
 canvas {
     background: #fff;
     border: 3px solid #444;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.6);
     display: block;
-    margin: 20px auto;
+    margin: 15px auto;
     cursor: crosshair;
+    touch-action: none;
+    max-width: 95%;
+    height: auto;
 }
 
+/* Modal Styles */
 .modal {
     position: fixed;
     top: 0;
@@ -227,6 +349,7 @@ canvas {
     align-items: center;
     justify-content: center;
     z-index: 2000;
+    padding: 20px;
 }
 
 .modal.hidden {
@@ -235,24 +358,26 @@ canvas {
 
 .modal-content {
     background: #2a2a2a;
-    padding: 30px;
+    padding: 25px;
     border-radius: 12px;
     max-width: 500px;
-    width: 90%;
+    width: 100%;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 
 .modal-content h2 {
     margin-bottom: 10px;
     color: #32c8c8;
+    font-size: 1.5rem;
 }
 
 .modal-content p {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     color: #aaa;
+    font-size: 0.95rem;
 }
 
-#room-input {
+#room-input, #name-input {
     width: 100%;
     padding: 12px;
     font-size: 16px;
@@ -260,10 +385,11 @@ canvas {
     border: 2px solid #444;
     border-radius: 8px;
     color: #fff;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    touch-action: manipulation;
 }
 
-#room-input:focus {
+#room-input:focus, #name-input:focus {
     outline: none;
     border-color: #32c8c8;
 }
@@ -271,7 +397,8 @@ canvas {
 .modal-buttons {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
 }
 
 .modal-buttons button {
@@ -283,6 +410,8 @@ canvas {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s;
+    touch-action: manipulation;
+    min-width: 120px;
 }
 
 .btn-primary {
@@ -294,6 +423,10 @@ canvas {
     background: #2aa8a8;
 }
 
+.btn-primary:active {
+    transform: scale(0.95);
+}
+
 .btn-secondary {
     background: #555;
     color: #fff;
@@ -301,6 +434,10 @@ canvas {
 
 .btn-secondary:hover {
     background: #666;
+}
+
+.btn-secondary:active {
+    transform: scale(0.95);
 }
 
 .quick-rooms {
@@ -315,7 +452,7 @@ canvas {
 }
 
 .quick-room-btn {
-    padding: 8px 15px;
+    padding: 10px 15px;
     margin: 5px;
     background: #1a1a1a;
     border: 1px solid #444;
@@ -324,6 +461,7 @@ canvas {
     cursor: pointer;
     font-size: 14px;
     transition: all 0.3s;
+    touch-action: manipulation;
 }
 
 .quick-room-btn:hover {
@@ -332,41 +470,248 @@ canvas {
     color: #32c8c8;
 }
 
+.quick-room-btn:active {
+    transform: scale(0.95);
+}
+
+/* Mobile Responsive - Tablet */
 @media (max-width: 768px) {
     h1 {
         font-size: 1.5rem;
+        margin: 10px 0 5px 0;
+    }
+    
+    #your-profile {
+        top: 5px;
+        right: 5px;
+        font-size: 11px;
+        padding: 6px 10px;
     }
     
     #stats {
+        font-size: 9px;
+        padding: 6px 8px;
+        top: 50px;
+        right: 5px;
+    }
+    
+    #connection-status {
         font-size: 10px;
-        padding: 8px 10px;
+        padding: 5px 10px;
+        top: 5px;
+        left: 5px;
+    }
+    
+    #drawing-activity {
+        top: 50px;
+        font-size: 11px;
+        padding: 6px 12px;
     }
     
     #room-info {
         flex-direction: column;
         gap: 8px;
+        padding: 8px 12px;
     }
     
     canvas {
-        width: calc(100% - 40px);
-        height: auto;
-        max-width: 900px;
+        width: 95%;
+        max-width: 100%;
+        border: 2px solid #444;
+        margin: 10px auto;
     }
     
     #toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
         gap: 8px;
-        padding: 10px;
+        padding: 10px 8px;
     }
     
-    #toolbar label {
-        width: 100%;
-        text-align: center;
+    #toolbar button {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        min-width: 70px;
+    }
+    
+    #toolbar input[type="range"] {
+        width: 80px;
+    }
+    
+    #users {
+        font-size: 0.9em;
+        padding: 6px;
+    }
+    
+    #users span {
+        font-size: 0.85em;
+        padding: 4px 8px;
     }
 }
 
+/* Mobile Responsive - Phone */
+@media (max-width: 480px) {
+    body {
+        padding-bottom: 10px;
+    }
+    
+    h1 {
+        font-size: 1.2rem;
+        margin: 8px 0 5px 0;
+    }
+    
+    #your-profile {
+        top: 3px;
+        right: 3px;
+        font-size: 10px;
+        padding: 5px 8px;
+    }
+    
+    #your-name strong {
+        font-size: 11px;
+    }
+    
+    #rename-btn {
+        font-size: 12px;
+    }
+    
+    #stats {
+        font-size: 8px;
+        padding: 5px 6px;
+        top: 45px;
+        right: 3px;
+    }
+    
+    #stats span {
+        margin: 2px 0;
+    }
+    
+    #connection-status {
+        font-size: 9px;
+        padding: 4px 8px;
+        top: 3px;
+        left: 3px;
+    }
+    
+    #drawing-activity {
+        top: 45px;
+        font-size: 10px;
+        padding: 5px 10px;
+    }
+    
+    #room-info {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+    }
+    
+    #current-room {
+        font-size: 12px;
+    }
+    
+    #current-room strong {
+        font-size: 14px;
+    }
+    
+    #change-room, #exit-room {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+    
+    canvas {
+        width: 98%;
+        height: auto;
+        min-height: 300px;
+        border-width: 2px;
+        margin: 8px auto;
+    }
+    
+    #toolbar {
+        padding: 8px 5px;
+        gap: 6px;
+        flex-direction: column;
+        width: 98%;
+    }
+    
+    #toolbar label {
+        font-size: 0.85rem;
+        width: 100%;
+    }
+    
+    #toolbar button {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.9rem;
+        min-width: auto;
+    }
+    
+    #toolbar input[type="range"] {
+        width: 100%;
+    }
+    
+    #toolbar input[type="color"] {
+        width: 60px;
+        height: 40px;
+    }
+    
+    #users {
+        font-size: 0.8em;
+        padding: 5px;
+        margin: 8px 0;
+    }
+    
+    #users span {
+        font-size: 0.8em;
+        padding: 4px 8px;
+        margin: 3px;
+    }
+    
+    .modal {
+        padding: 15px;
+    }
+    
+    .modal-content {
+        padding: 20px 15px;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.3rem;
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+    }
+    
+    .modal-buttons button {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .quick-room-btn {
+        width: calc(50% - 10px);
+        display: inline-block;
+    }
+}
+
+/* Landscape mode on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    h1 {
+        font-size: 1.3rem;
+        margin: 5px 0;
+    }
+    
+    #toolbar {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    canvas {
+        max-height: 60vh;
+    }
+    
+    #users {
+        font-size: 0.85em;
+    }
+}
+
+/* Animations */
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
@@ -376,23 +721,20 @@ canvas {
     from { transform: translateX(0); opacity: 1; }
     to { transform: translateX(100%); opacity: 0; }
 }
-/* Exit button styles */
-#exit-room {
-    padding: 6px 12px;
-    background: #944;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.3s;
+
+/* Touch feedback */
+@media (hover: none) {
+    #toolbar button:active,
+    #change-room:active,
+    #exit-room:active,
+    .quick-room-btn:active,
+    .modal-buttons button:active {
+        transform: scale(0.95);
+        background: #777;
+    }
+}
+
+/* Prevent zoom on double tap */
+button, input, select, textarea {
     touch-action: manipulation;
-}
-
-#exit-room:hover {
-    background: #a55;
-}
-
-#exit-room:active {
-    transform: scale(0.95);
 }

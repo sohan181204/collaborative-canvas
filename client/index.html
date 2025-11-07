@@ -19,10 +19,21 @@
         <button id="exit-room">🚪 Exit</button>
     </div>
     
+    <!-- Your Profile Badge (Top Right) -->
+    <div id="your-profile">
+        <span id="your-name">You: <strong>Loading...</strong></span>
+        <button id="rename-btn" title="Change your name">✏️</button>
+    </div>
+    
     <div id="stats">
         <span id="fps">FPS: --</span>
         <span id="latency">Latency: --ms</span>
         <span id="paths-count">Paths: 0</span>
+    </div>
+    
+    <!-- Drawing Activity Indicator -->
+    <div id="drawing-activity" class="hidden">
+        <span id="drawing-user">User 1</span> is drawing...
     </div>
     
     <div id="toolbar">
@@ -40,6 +51,7 @@
     <div id="users"></div>
     <canvas id="canvas" width="900" height="600"></canvas>
     
+    <!-- Room Change Modal -->
     <div id="room-modal" class="modal hidden">
         <div class="modal-content">
             <h2>Join a Room</h2>
@@ -59,7 +71,20 @@
         </div>
     </div>
     
-    <!-- ✅ NEW: Exit Confirmation Modal -->
+    <!-- Rename Modal -->
+    <div id="rename-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Change Your Name</h2>
+            <p>Enter a new display name (3-20 characters)</p>
+            <input type="text" id="name-input" placeholder="Enter your name" maxlength="20">
+            <div class="modal-buttons">
+                <button id="save-name-btn" class="btn-primary">Save Name</button>
+                <button id="cancel-name-btn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Exit Confirmation Modal -->
     <div id="exit-modal" class="modal hidden">
         <div class="modal-content">
             <h2>Leave Room?</h2>

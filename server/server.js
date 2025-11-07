@@ -11,9 +11,7 @@ const wss = new WebSocket.Server({ server });
 app.use(express.static(path.join(__dirname, '..', 'client')));
 
 const users = {};
-let userCount = 0; // Global counter for unique IDs
-
-// ✅ NEW: Track active connections to reset counter when all leave
+let userCount = 0;
 let activeConnections = 0;
 
 function broadcast(data, roomId, excludeUserId = null) {
@@ -48,7 +46,6 @@ function getRoomUsers(roomId) {
 wss.on('connection', function connection(ws) {
     activeConnections++;
     
-    // ✅ FIXED: Generate sequential user number based on active connections
     const userNumber = Object.keys(users).length + 1;
     const userId = 'user_' + (++userCount);
     const color = '#' + Math.floor(Math.random()*16777215).toString(16);
@@ -106,6 +103,25 @@ wss.on('connection', function connection(ws) {
                     console.error('Pong error:', e);
                 }
                 break;
+            
+            case 'rename-user':
+                if (msg.newName && users[userId]) {
+                    users[userId].name = msg.newName;
+                    broadcast({ 
+                        type: 'user-renamed', 
+                        userId, 
+                        newName: msg.newName 
+                    }, ws.roomId);
+                    console.log(`User ${userId} renamed to: ${msg.newName}`);
+                }
+                break;
+            
+            case 'drawing-start':
+                broadcast({ 
+                    type: 'drawing-start', 
+                    userId 
+                }, ws.roomId, userId);
+                break;
                 
             case 'draw-path':
                 broadcast({ 
@@ -153,7 +169,6 @@ wss.on('connection', function connection(ws) {
             userId 
         }, ws.roomId);
         
-        // ✅ FIXED: Reset user counter when all users leave
         if (activeConnections === 0) {
             userCount = 0;
             console.log('🔄 All users disconnected. User counter reset to 0.');
@@ -167,7 +182,6 @@ wss.on('connection', function connection(ws) {
     });
 });
 
-// Heartbeat interval
 const heartbeatInterval = setInterval(() => {
     wss.clients.forEach((ws) => {
         if (ws.isAlive === false) {
