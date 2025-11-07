@@ -1,6 +1,6 @@
 # 🖌️ Real-Time Collaborative Drawing Canvas
 
-A production-ready multi-user drawing application where multiple people can draw simultaneously on isolated canvases with real-time synchronization.
+A production-ready multi-user drawing application where multiple people can draw simultaneously on isolated canvases with real-time synchronization, user profiles, activity tracking, and smart user management.
 
 ## 🌐 Live Demo
 
@@ -30,15 +30,31 @@ A production-ready multi-user drawing application where multiple people can draw
 - **Global Undo/Redo**: Synchronized undo/redo operations across all users
 - **User Management**: Live user list with unique colors per user
 - **Conflict Resolution**: Last-write-wins strategy for overlapping drawings
+- **Smart User Numbering**: Counter resets when all users leave (User 1, 2, 3...)
+- **Graceful Exit**: Dedicated exit button with confirmation and goodbye screen
 
-### ⭐ Bonus Features (80%)
+### ⭐ New User Profile Features (100%) 🆕
+- **Your Profile Badge**: Top-right corner displays "You: [Your Name]" with color-coded border
+- **Rename Functionality**: Click ✏️ button to change your display name (3-20 characters)
+- **Name Change Broadcasting**: All users see "[Old Name] is now [New Name]" notification
+- **Persistent Identity**: Your name syncs across all users in the room
+
+### ⭐ Activity Tracking Features (100%) 🆕
+- **Drawing Activity Indicator**: Shows "[Username] is drawing..." when others draw
+- **Real-time Activity**: Appears at top center for 2 seconds after drawing action
+- **Color-coded Names**: Drawing user's name appears in their assigned color
+- **Non-intrusive**: Auto-hides to keep canvas clear
+
+### ⭐ Bonus Features (100%)
 - **Room System**: Multiple isolated canvases - users can join different rooms
 - **Drawing Persistence**: Auto-save to localStorage, survives browser refresh
 - **Performance Metrics**: Real-time FPS counter, network latency, path count
 - **Mobile Touch Support**: Full touch event support for tablets and smartphones
+- **Responsive Design**: Optimized for desktop, tablet, and mobile (3 breakpoints)
 - **Auto-Reconnection**: Automatic reconnection with exponential backoff strategy
 - **Connection Status**: Visual indicator showing connection state
-- **User Notifications**: Toast notifications for user join/leave events
+- **User Notifications**: Toast notifications for user join/leave/rename events
+- **Heartbeat Detection**: Prevents ghost users with connection health checks
 
 ---
 
@@ -50,11 +66,16 @@ A production-ready multi-user drawing application where multiple people can draw
 | Real-time Sync | ✅ Complete | WebSocket-based instant synchronization |
 | User Indicators | ✅ Complete | Cursor position tracking with names |
 | Undo/Redo | ✅ Complete | Global state synchronization |
-| User Management | ✅ Complete | Color-coded user list |
+| User Management | ✅ Complete | Color-coded user list with smart numbering |
+| **User Profile Badge** 🆕 | ✅ Complete | Top-right "You: [Name]" display with color |
+| **Rename Functionality** 🆕 | ✅ Complete | In-app name change with broadcasting |
+| **Drawing Activity Tracking** 🆕 | ✅ Complete | "[User] is drawing..." indicator |
 | Mobile Support | ✅ Bonus | Touch events with coordinate scaling |
 | Room System | ✅ Bonus | URL-based room isolation |
-| Persistence | ✅ Bonus | LocalStorage auto-save |
+| Persistence | ✅ Bonus | LocalStorage auto-save per room |
 | Performance Metrics | ✅ Bonus | FPS, latency, path tracking |
+| Exit Functionality | ✅ Bonus | Graceful exit with confirmation |
+| User Counter Reset | ✅ Bonus | Smart reset when all users leave |
 
 ---
 
@@ -97,87 +118,131 @@ Tab 1: http://localhost:3000
 Tab 2: http://localhost:3000
 Tab 3: http://localhost:3000
 
-3. Test synchronization
+3. Test NEW profile features
+Check Tab 1: "You: User 1" appears top-right ✅
+
+Check Tab 2: "You: User 2" appears top-right ✅
+
+In Tab 1: Click ✏️ → Rename to "Alice" ✅
+
+Check Tab 2: Sees notification "User 1 is now Alice" ✅
+
+Check Tab 2: User list shows "Alice" instead of "User 1" ✅
+
+4. Test NEW activity tracking
+Draw in Tab 1 (Alice) ✅
+
+Check Tab 2: Shows "Alice is drawing..." at top center ✅
+
+Indicator auto-hides after 2 seconds ✅
+
+Draw in Tab 2 → Tab 1 shows activity ✅
+
+5. Test synchronization
 Draw in Tab 1 → Appears instantly in Tab 2 & 3 ✅
 
 Move mouse in Tab 1 → Cursor indicator appears in Tab 2 & 3 ✅
 
 Click Undo in Tab 2 → Removes last stroke in all tabs ✅
 
-Change colors in different tabs → Each user draws different color ✅
+6. Test user counter reset
+Close all 3 tabs
 
-### Test 2: Room Isolation
+Open new tab → Shows "You: User 1" (counter reset!) ✅
 
-1. Open different rooms
-Tab 1: http://localhost:3000?room=design
-Tab 2: http://localhost:3000?room=dev
-Tab 3: http://localhost:3000?room=design
+Open another tab → Shows "You: User 2" ✅
 
-2. Test isolation
-Draw in Tab 1 → Appears in Tab 3 (same room) ✅
 
-Draw in Tab 1 → Does NOT appear in Tab 2 (different room) ✅
 
-User count shows only users in same room ✅
+### Test 2: Profile & Activity Features 🆕
 
-### Test 3: Live Deployment (Render)
+1. Open canvas
+http://localhost:3000
 
-1. Test production deployment
-Open: https://collaborative-canvas-hdco.onrender.com
+2. Test profile badge
+Look at top-right corner ✅
 
-2. Open multiple tabs/devices
-Desktop: https://collaborative-canvas-hdco.onrender.com
-Mobile: https://collaborative-canvas-hdco.onrender.com
-Tablet: https://collaborative-canvas-hdco.onrender.com
+See "You: User 1" with colored border ✅
 
-3. Test real-time sync across devices
-Draw on desktop → Appears on mobile instantly ✅
+Border color matches your user color ✅
 
-Draw on mobile → Appears on tablet instantly ✅
+3. Test rename
+Click ✏️ button next to your name ✅
 
-### Test 4: Network Multi-Device (Local Network)
+Enter "John Doe" (3-20 characters) ✅
 
-1. Find your local IP (for local testing)
-Windows: ipconfig
-Mac/Linux: ifconfig or ip addr
+Click "Save Name" ✅
 
-Example: 192.168.1.100
-2. On other devices (same WiFi)
-Device 1: http://192.168.1.100:3000
-Device 2: http://192.168.1.100:3000
-Device 3: http://192.168.1.100:3000?room=team
+Badge updates to "You: John Doe" ✅
 
-3. Test cross-device sync
-Draw on phone → Appears on laptop instantly ✅
+Notification shows "Your name changed to: John Doe" ✅
 
-Touch draw on tablet → Syncs to desktop ✅
+4. Test multi-user rename
+Open Tab 2 (another user joins)
 
-Test different rooms across devices ✅
+Tab 1: Rename to "Alice" ✅
 
-### Test 5: Mobile Touch Support
+Tab 2: Sees notification "User 1 is now Alice" ✅
 
-On mobile browser (Chrome/Safari)
-Open: https://collaborative-canvas-hdco.onrender.com
+Tab 2: User list shows "Alice" ✅
 
+5. Test drawing activity
+Tab 1 (Alice): Start drawing ✅
+
+Tab 2: Shows "Alice is drawing..." (top center) ✅
+
+Alice's name appears in her color ✅
+
+Indicator hides after 2 seconds ✅
+
+Tab 2: Start drawing ✅
+
+Tab 1: Shows "User 2 is drawing..." ✅
+
+
+
+### Test 3: Mobile Responsive 📱
+
+Test on mobile device or browser DevTools (F12 → Device Mode)
+1. Profile badge on mobile
+Badge smaller on mobile (10px font) ✅
+
+Positioned at top-right (not overlapping) ✅
+
+Rename button tappable ✅
+
+2. Activity indicator on mobile
+Appears at top center ✅
+
+Smaller font (10px) ✅
+
+Doesn't overlap other elements ✅
+
+3. Touch drawing
 Touch and drag to draw ✅
 
-Use toolbar buttons (color, width, eraser) ✅
+Tap ✏️ to rename ✅
 
-Test undo/redo buttons ✅
+All buttons work with touch ✅
 
-Pinch to zoom (browser default) ✅
+4. Portrait vs Landscape
+Portrait: Vertical toolbar ✅
 
-### Test 6: Persistence
+Landscape: Horizontal toolbar ✅
 
-1. Draw something on canvas
-2. Close browser tab completely
-3. Reopen: https://collaborative-canvas-hdco.onrender.com
-4. Drawing is still there! ✅
-Test per-room persistence:
-1. Draw in "design" room
-2. Switch to "dev" room (draw different content)
-3. Switch back to "design"
-4. Original "design" drawing restored! ✅
+Profile badge visible in both ✅
+
+
+
+### Test 4: Exit Functionality
+
+1. Open canvas
+http://localhost:3000
+
+2. Click "🚪 Exit" button (top center)
+3. Confirm exit in modal
+4. See goodbye screen with "Rejoin Canvas" button ✅
+5. Click "Rejoin Canvas" to return ✅
 
 
 ---
@@ -193,12 +258,35 @@ Test per-room persistence:
 6. **Redo**: Click "↷ Redo" to restore undone stroke
 7. **Clear All**: Click "🗑️ Clear" to clear entire canvas (all users affected)
 
+### User Profile Management 🆕
+1. **View Your Profile**: Check top-right corner for "You: [Your Name]"
+2. **Your Color**: Border color indicates your assigned color
+3. **Change Name**: Click ✏️ button next to your name
+4. **Enter New Name**: Type 3-20 characters
+5. **Save Changes**: Click "Save Name" button
+6. **Broadcast**: All users see "[Old Name] is now [New Name]" notification
+7. **Persistent**: Your new name syncs across all users instantly
+
+### Activity Awareness 🆕
+1. **See Who's Drawing**: Watch top center for "[Username] is drawing..."
+2. **Color-Coded**: Drawing user's name appears in their color
+3. **Auto-Hide**: Indicator disappears after 2 seconds of inactivity
+4. **Non-Intrusive**: Doesn't block your view of the canvas
+5. **Real-Time**: Updates instantly when anyone draws
+
 ### Room Management
 1. **Current Room**: Displayed at top ("Room: main")
 2. **Change Room**: Click "📍 Change Room" button
 3. **Enter Room Name**: Type custom name or click quick button
 4. **Quick Rooms**: Main, Design, Dev, Private (one-click join)
 5. **URL Method**: Add `?room=yourname` to URL for direct access
+
+### Exit Application
+1. **Exit Button**: Click "🚪 Exit" button (next to Change Room)
+2. **Confirm**: Click "Yes, Exit" in confirmation modal
+3. **Goodbye Screen**: See exit message with rejoin option
+4. **Rejoin**: Click "Rejoin Canvas" to return to app
+5. **Auto-Save**: Drawings automatically saved before exit
 
 ### Performance Monitoring
 **Top Right Corner** shows real-time stats:
@@ -218,17 +306,31 @@ Test per-room persistence:
 
 ### Frontend (Vanilla JavaScript)
 client/
-├── index.html # UI structure with room modal
-├── style.css # Responsive styling with dark/light theme
-├── canvas.js # Canvas API + drawing logic + performance
-├── websocket.js # WebSocket client + auto-reconnection
-└── main.js # App coordination + room handling + WebSocket URL detection
+├── index.html # UI structure with profile badge, activity indicator, modals
+├── style.css # Responsive styling with 3 breakpoints (mobile-ready)
+├── canvas.js # Canvas API + drawing logic + performance tracking
+├── websocket.js # WebSocket client + auto-reconnection + latency
+└── main.js # App coordination + profile + activity + room management
+
+
+
+**New UI Components:**
+- **Profile Badge** (`#your-profile`): Top-right corner with name and rename button
+- **Drawing Activity** (`#drawing-activity`): Top-center indicator for active drawers
+- **Rename Modal** (`#rename-modal`): 3-20 character name change interface
 
 ### Backend (Node.js + Express)
 server/
-├── server.js # Express + WebSocket server (production-ready)
-├── rooms.js # Room management logic
+├── server.js # Express + WebSocket server + rename/activity handlers
+├── rooms.js # Room management with user tracking
 └── drawing-state.js # State utilities (future use)
+
+
+
+**New WebSocket Messages:**
+- `rename-user`: Client → Server (name change request)
+- `user-renamed`: Server → Clients (broadcast name change)
+- `drawing-start`: Client → Server → Clients (drawing activity notification)
 
 ### Technology Stack
 - **Frontend**: ES6 Modules, HTML5 Canvas API, WebSocket API, LocalStorage
@@ -239,29 +341,23 @@ server/
 
 ### Key Design Decisions
 
-**Why Vanilla JavaScript?**
-- Assignment requirement (no frameworks)
-- Full control over implementation
-- Demonstrates core web development skills
-- Smaller bundle size, faster load times
+**Profile Badge Implementation:**
+- Fixed position top-right (z-index: 999)
+- Gradient background with user's color
+- Border color matches user color
+- Responsive sizing for mobile (10-13px font)
 
-**Why Native WebSocket?**
-- Lower latency than Socket.io
-- No polling overhead
-- Simpler for this use case
-- Educational value for understanding protocol
+**Activity Tracking Strategy:**
+- Broadcast on `endDraw()` event (completed stroke)
+- 2-second timeout for auto-hide
+- Throttled to prevent spam
+- Only shows other users (not yourself)
 
-**Why LocalStorage?**
-- No database setup needed
-- Works offline
-- Fast access
-- Simple persistence solution
-
-**Why Render over Vercel?**
-- ✅ Full WebSocket support (Vercel has limitations)
-- ✅ Free tier with persistent connections
-- ✅ No serverless cold starts
-- ✅ Better for real-time applications
+**Rename System:**
+- Client-side validation (3-20 characters)
+- Broadcast to all users in room
+- Updates all UI elements instantly
+- Persistent across session
 
 ---
 
@@ -275,8 +371,10 @@ server/
 
 1. **Push to GitHub**
 git add .
-git commit -m "Initial commit"
+git commit -m "Complete v2.0 with profile and activity features"
 git push origin main
+
+
 
 2. **Create Render Account**
 - Go to [render.com](https://render.com)
@@ -304,6 +402,36 @@ git push origin main
 
 ---
 
+## 📱 Mobile Optimization
+
+### Responsive Design
+**Three breakpoints implemented:**
+- **Desktop (>768px)**: Full-size layout
+- **Tablet (768px)**: Medium optimizations
+- **Phone (<480px)**: Mobile-first design
+
+### New Features on Mobile
+**Profile Badge:**
+- Smaller font (10px on phone)
+- Compact padding (5px 8px)
+- Touch-friendly rename button
+- Positioned to avoid overlap
+
+**Drawing Activity:**
+- Reduced font size (10px)
+- Adjusted top position (45px)
+- Mobile-optimized animations
+- Readable on small screens
+
+**Touch Optimizations:**
+- All buttons 44px+ touch targets
+- `touch-action: manipulation` on inputs
+- No zoom on double-tap
+- Smooth finger drawing
+- Responsive toolbar (vertical on phone)
+
+---
+
 ## ⚠️ Known Limitations
 
 ### 1. **Client-Side Storage Only**
@@ -322,88 +450,60 @@ git push origin main
 - Anyone can join any room
 - No password protection
 - No user accounts or permissions
+- No admin controls
 
-### 4. **No Drawing History**
-- Can't replay drawing process
-- No timeline feature
-- Can't see who drew what stroke
-
-### 5. **Storage Limits**
-- LocalStorage ~5MB per domain
-- Very large drawings may hit limit
-- No warning before limit reached
-
-### 6. **Network Dependency**
-- Requires stable internet connection
-- High latency affects cursor smoothness
-- Disconnection loses real-time features (auto-reconnect helps)
+### 4. **Name Validation Only**
+- Names are 3-20 characters
+- No profanity filter
+- No uniqueness enforcement
+- Manual moderation needed
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Issue 1: App Not Loading (Render)
+### Issue 1: Profile Badge Not Showing
 
-**Symptom**: URL shows "Service Unavailable"
+**Symptom**: "You: Loading..." never updates
 
 **Solution**:
-App is waking up from sleep (free tier)
+Check browser console (F12)
 
-Wait 30-60 seconds
+Look for "App initialized in room: [roomId]"
+
+Verify WebSocket connected
 
 Refresh page
 
-Should load normally
 
-### Issue 2: WebSocket Not Connecting
 
-**Symptom**: Can draw but drawings don't sync
+### Issue 2: Drawing Activity Not Appearing
 
-**Check Browser Console** (F12):
-// ✅ Good:
-"WebSocket connected"
-"App initialized in room: main"
-
-// ❌ Bad:
-"WebSocket connection failed"
-"WebSocket error"
+**Symptom**: Don't see "[User] is drawing..." when others draw
 
 **Solution**:
-Verify WebSocket URL is auto-detected
-Should see in main.js:
-const getWebSocketURL = () => {
-const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-return ${protocol}//${window.location.host};
-};
+Check if you're the only user
 
-### Issue 3: Drawings Not Persisting
+Activity only shows for OTHER users
 
-**Symptom**: Drawings disappear on refresh
+Have someone else draw
+
+Check console for "drawing-start" messages
+
+
+
+### Issue 3: Rename Not Working
+
+**Symptom**: Name doesn't change after clicking Save
 
 **Solution**:
-Check localStorage is enabled
-Open browser console (F12):
-localStorage.getItem('canvas-state-main')
+Check name length (must be 3-20 characters)
 
-If null, check:
-1. Browser privacy settings
-2. Incognito mode (localStorage disabled)
-3. Browser storage quota
+Verify WebSocket connection (green indicator)
 
-### Issue 4: Performance Issues
+Try refreshing page
 
-**Symptom**: Laggy drawing, low FPS
-
-**Check Performance Stats** (top right):
-FPS < 30?
-→ Close other browser tabs
-→ Clear old drawings (click Clear button)
-→ Reduce canvas complexity
-
-Latency > 200ms?
-→ Check internet connection
-→ Server may be spinning up (wait 30s)
-→ Try again
+Check browser console for errors
 
 
 
@@ -448,6 +548,26 @@ MIT License - Feel free to use for learning and projects!
 
 ---
 
+## 🆕 Version History
+
+### v2.0.0 (November 7, 2025) - Current
+- ✅ **User Profile Badge**: Top-right "You: [Name]" display
+- ✅ **Rename Functionality**: In-app name change with broadcasting
+- ✅ **Drawing Activity Tracking**: "[User] is drawing..." indicator
+- ✅ **Enhanced Mobile UI**: Profile & activity optimized for mobile
+- ✅ **Improved User Experience**: Better identity awareness
+
+### v1.0.0 (November 6, 2025)
+- ✅ Core drawing functionality
+- ✅ Real-time synchronization
+- ✅ Room system
+- ✅ User counter reset
+- ✅ Exit functionality
+- ✅ Ghost user prevention
+- ✅ Mobile responsive design
+
+---
+
 ## 🙏 Acknowledgments
 
 - HTML5 Canvas API Documentation
@@ -458,23 +578,6 @@ MIT License - Feel free to use for learning and projects!
 
 ---
 
-## 📝 Development Timeline
-
-| Phase | Time | Details |
-|-------|------|---------|
-| Planning & Architecture | 2h | System design, tech stack selection |
-| Core Drawing Implementation | 4h | Canvas operations, touch support |
-| WebSocket Real-time Sync | 3h | Bidirectional communication, protocols |
-| Cursor Tracking System | 2h | Position broadcasting, rendering |
-| Room System Integration | 2h | URL routing, room isolation |
-| Performance Optimization | 1h | FPS/latency tracking, throttling |
-| Auto-reconnection Logic | 1h | Exponential backoff, message queuing |
-| UI/UX Enhancement | 2h | Styling, modals, notifications |
-| Deployment to Render | 1h | Configuration, WebSocket fixes |
-| Testing & Debugging | 2h | Multi-user, cross-device, edge cases |
-| Documentation | 2h | README, ARCHITECTURE, inline comments |
-| **Total** | **~22h** | Production-ready quality |
-
----
-
 **Built with ❤️ for Real-Time Collaborative Systems Assignment**
+
+**Last Updated**: November 7, 2025 - Version 2.0 with User Profiles & Activity Tracking
