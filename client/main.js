@@ -6,7 +6,6 @@ let currentRoom = new URLSearchParams(window.location.search).get('room') ||
 
 localStorage.setItem('canvas-room', currentRoom);
 
-// ✅ FIXED: Auto-detect WebSocket URL for production
 const getWebSocketURL = () => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
@@ -41,6 +40,60 @@ const roomInput = document.getElementById('room-input');
 const changeRoomBtn = document.getElementById('change-room');
 const joinRoomBtn = document.getElementById('join-room-btn');
 const cancelRoomBtn = document.getElementById('cancel-room-btn');
+
+// ✅ NEW: Exit button functionality
+const exitRoomBtn = document.getElementById('exit-room');
+const exitModal = document.getElementById('exit-modal');
+const confirmExitBtn = document.getElementById('confirm-exit-btn');
+const cancelExitBtn = document.getElementById('cancel-exit-btn');
+
+exitRoomBtn.addEventListener('click', () => {
+    exitModal.classList.remove('hidden');
+});
+
+cancelExitBtn.addEventListener('click', () => {
+    exitModal.classList.add('hidden');
+});
+
+confirmExitBtn.addEventListener('click', () => {
+    // Save current state
+    drawer.saveRoomState(currentRoom);
+    
+    // Close WebSocket connection
+    ws.close();
+    
+    // Show exit message
+    document.body.innerHTML = `
+        <div style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #222;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        ">
+            <h1 style="font-size: 3rem; margin-bottom: 20px;">👋 Goodbye!</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">You have left the room successfully.</p>
+            <p style="color: #aaa; margin-bottom: 30px;">Your drawings have been saved locally.</p>
+            <button onclick="window.location.href='/'" style="
+                padding: 12px 30px;
+                font-size: 1rem;
+                background: #32c8c8;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s;
+            " onmouseover="this.style.background='#2aa8a8'" onmouseout="this.style.background='#32c8c8'">
+                Rejoin Canvas
+            </button>
+        </div>
+    `;
+});
 
 changeRoomBtn.addEventListener('click', () => {
     roomModal.classList.remove('hidden');
@@ -124,7 +177,6 @@ ws.on('user-joined', (msg) => {
     showNotification(`${msg.user.name} joined ${currentRoom}`, msg.user.color);
 });
 
-// ✅ FIXED: Enhanced user-left handler
 ws.on('user-left', (msg) => {
     console.log('User left:', msg.userId);
     

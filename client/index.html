@@ -16,6 +16,7 @@
     <div id="room-info">
         <span id="current-room">Room: <strong>Loading...</strong></span>
         <button id="change-room">📍 Change Room</button>
+        <button id="exit-room">🚪 Exit</button>
     </div>
     
     <div id="stats">
@@ -54,6 +55,18 @@
                 <button class="quick-room-btn" data-room="design">Design Team</button>
                 <button class="quick-room-btn" data-room="dev">Dev Team</button>
                 <button class="quick-room-btn" data-room="private">Private</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ✅ NEW: Exit Confirmation Modal -->
+    <div id="exit-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Leave Room?</h2>
+            <p>Are you sure you want to exit? Your drawings will be saved locally.</p>
+            <div class="modal-buttons">
+                <button id="confirm-exit-btn" class="btn-primary">Yes, Exit</button>
+                <button id="cancel-exit-btn" class="btn-secondary">Cancel</button>
             </div>
         </div>
     </div>

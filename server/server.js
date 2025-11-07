@@ -11,7 +11,10 @@ const wss = new WebSocket.Server({ server });
 app.use(express.static(path.join(__dirname, '..', 'client')));
 
 const users = {};
-let userCount = 0;
+let userCount = 0; // Global counter for unique IDs
+
+// ✅ NEW: Track active connections to reset counter when all leave
+let activeConnections = 0;
 
 function broadcast(data, roomId, excludeUserId = null) {
     let sentCount = 0;
@@ -43,14 +46,19 @@ function getRoomUsers(roomId) {
 }
 
 wss.on('connection', function connection(ws) {
+    activeConnections++;
+    
+    // ✅ FIXED: Generate sequential user number based on active connections
+    const userNumber = Object.keys(users).length + 1;
     const userId = 'user_' + (++userCount);
     const color = '#' + Math.floor(Math.random()*16777215).toString(16);
-    users[userId] = { id: userId, name: `User ${userCount}`, color };
+    
+    users[userId] = { id: userId, name: `User ${userNumber}`, color };
     ws.userId = userId;
     ws.roomId = 'main';
     ws.isAlive = true;
 
-    console.log(`✓ User ${userId} connected (total users: ${Object.keys(users).length})`);
+    console.log(`✓ User ${userId} (${users[userId].name}) connected (total: ${activeConnections})`);
 
     ws.on('pong', () => {
         ws.isAlive = true;
@@ -88,7 +96,7 @@ wss.on('connection', function connection(ws) {
                 } catch (e) {
                     console.error('Join error:', e);
                 }
-                console.log(`User ${userId} joined room: ${ws.roomId} (${Object.keys(roomUsers).length} users in room)`);
+                console.log(`User ${userId} joined room: ${ws.roomId} (${Object.keys(roomUsers).length} users)`);
                 break;
                 
             case 'ping':
@@ -134,7 +142,8 @@ wss.on('connection', function connection(ws) {
     });
 
     ws.on('close', function() {
-        console.log(`✗ User ${userId} disconnected from room: ${ws.roomId}`);
+        activeConnections--;
+        console.log(`✗ User ${userId} (${users[userId]?.name}) disconnected from room: ${ws.roomId}`);
         
         rooms.leaveRoom(ws.roomId, userId);
         delete users[userId];
@@ -144,7 +153,13 @@ wss.on('connection', function connection(ws) {
             userId 
         }, ws.roomId);
         
-        console.log(`Remaining users: ${Object.keys(users).length}`);
+        // ✅ FIXED: Reset user counter when all users leave
+        if (activeConnections === 0) {
+            userCount = 0;
+            console.log('🔄 All users disconnected. User counter reset to 0.');
+        }
+        
+        console.log(`Remaining connections: ${activeConnections}`);
     });
 
     ws.on('error', function(error) {
@@ -152,7 +167,7 @@ wss.on('connection', function connection(ws) {
     });
 });
 
-// Heartbeat interval to detect dead connections
+// Heartbeat interval
 const heartbeatInterval = setInterval(() => {
     wss.clients.forEach((ws) => {
         if (ws.isAlive === false) {
@@ -177,7 +192,6 @@ process.on('SIGTERM', () => {
     });
 });
 
-// ✅ FIXED: Listen on all interfaces for production
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`

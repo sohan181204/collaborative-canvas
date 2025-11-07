@@ -376,3 +376,23 @@ canvas {
     from { transform: translateX(0); opacity: 1; }
     to { transform: translateX(100%); opacity: 0; }
 }
+/* Exit button styles */
+#exit-room {
+    padding: 6px 12px;
+    background: #944;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s;
+    touch-action: manipulation;
+}
+
+#exit-room:hover {
+    background: #a55;
+}
+
+#exit-room:active {
+    transform: scale(0.95);
+}
