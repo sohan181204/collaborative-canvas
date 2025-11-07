@@ -143,25 +143,19 @@ process.on('SIGTERM', () => {
     });
 });
 
+// ✅ FIXED: Listen on all interfaces for Render
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`
 ╔════════════════════════════════════════════════════╗
 ║   🖌️  Collaborative Drawing Canvas Server        ║
 ║                                                    ║
-║   🌐 Server: http://localhost:${PORT}               ║
+║   🌐 Port: ${PORT}                                  ║
 ║   📁 Rooms: Enabled                                ║
 ║   📊 Status: Running                               ║
+║   🔧 Environment: ${process.env.NODE_ENV || 'development'}
 ║                                                    ║
-║   💡 Test Instructions:                           ║
-║   1. Open: http://localhost:${PORT}                 ║
-║   2. Open multiple tabs                            ║
-║   3. Try different rooms:                          ║
-║      • http://localhost:${PORT}?room=design          ║
-║      • http://localhost:${PORT}?room=team1           ║
-║      • http://localhost:${PORT}?room=private         ║
-║                                                    ║
-║   ✅ All features enabled                          ║
+║   ✅ Ready for connections                         ║
 ╚════════════════════════════════════════════════════╝
     `);
 });

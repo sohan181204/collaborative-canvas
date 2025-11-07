@@ -1,12 +1,20 @@
 import { CanvasDrawer } from './canvas.js';
 import { CanvasWebSocket } from './websocket.js';
 
+// Get room from URL or localStorage
 let currentRoom = new URLSearchParams(window.location.search).get('room') || 
                   localStorage.getItem('canvas-room') || 'main';
 
 localStorage.setItem('canvas-room', currentRoom);
 
-const ws = new CanvasWebSocket('ws://' + location.hostname + ':3000', {
+// ✅ FIXED: Auto-detect WebSocket URL for production
+const getWebSocketURL = () => {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    return `${protocol}//${host}`;
+};
+
+const ws = new CanvasWebSocket(getWebSocketURL(), {
     maxReconnectAttempts: 10,
     reconnectDelay: 3000
 });
