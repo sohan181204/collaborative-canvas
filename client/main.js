@@ -1,7 +1,6 @@
 import { CanvasDrawer } from './canvas.js';
 import { CanvasWebSocket } from './websocket.js';
 
-// Get room from URL or localStorage
 let currentRoom = new URLSearchParams(window.location.search).get('room') || 
                   localStorage.getItem('canvas-room') || 'main';
 
@@ -125,15 +124,22 @@ ws.on('user-joined', (msg) => {
     showNotification(`${msg.user.name} joined ${currentRoom}`, msg.user.color);
 });
 
+// ✅ FIXED: Enhanced user-left handler
 ws.on('user-left', (msg) => {
+    console.log('User left:', msg.userId);
+    
     const user = users[msg.userId];
     if (user) {
         showNotification(`${user.name} left`, user.color);
+        console.log(`Removing user: ${user.name} (${msg.userId})`);
     }
+    
     delete users[msg.userId];
     delete cursors[msg.userId];
     updateUsersUI();
     drawer.redraw();
+    
+    console.log('Remaining users:', Object.keys(users).length);
 });
 
 ws.on('draw-path', (msg) => {

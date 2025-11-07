@@ -11,6 +11,6 @@
     "ws": "^8.13.0"
   },
   "keywords": ["canvas", "real-time", "websocket", "collaborative", "nodejs"],
-  "author": "Your Name",
+  "author": "Sohan",
   "license": "MIT"
 }

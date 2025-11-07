@@ -14,23 +14,28 @@ const users = {};
 let userCount = 0;
 
 function broadcast(data, roomId, excludeUserId = null) {
+    let sentCount = 0;
     wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN && 
             client.roomId === roomId &&
             client.userId !== excludeUserId) {
             try {
                 client.send(JSON.stringify(data));
+                sentCount++;
             } catch (e) {
                 console.error('Broadcast error:', e);
             }
         }
     });
+    console.log(`Broadcasted ${data.type} to ${sentCount} users in room ${roomId}`);
 }
 
 function getRoomUsers(roomId) {
     const roomUsers = {};
     wss.clients.forEach(client => {
-        if (client.roomId === roomId && users[client.userId]) {
+        if (client.readyState === WebSocket.OPEN &&
+            client.roomId === roomId && 
+            users[client.userId]) {
             roomUsers[client.userId] = users[client.userId];
         }
     });
@@ -43,8 +48,13 @@ wss.on('connection', function connection(ws) {
     users[userId] = { id: userId, name: `User ${userCount}`, color };
     ws.userId = userId;
     ws.roomId = 'main';
+    ws.isAlive = true;
 
-    console.log(`✓ User ${userId} connected`);
+    console.log(`✓ User ${userId} connected (total users: ${Object.keys(users).length})`);
+
+    ws.on('pong', () => {
+        ws.isAlive = true;
+    });
 
     ws.on('message', function incoming(message) {
         let msg;
@@ -78,7 +88,7 @@ wss.on('connection', function connection(ws) {
                 } catch (e) {
                     console.error('Join error:', e);
                 }
-                console.log(`User ${userId} joined room: ${ws.roomId}`);
+                console.log(`User ${userId} joined room: ${ws.roomId} (${Object.keys(roomUsers).length} users in room)`);
                 break;
                 
             case 'ping':
@@ -124,10 +134,17 @@ wss.on('connection', function connection(ws) {
     });
 
     ws.on('close', function() {
-        console.log(`✗ User ${userId} disconnected`);
+        console.log(`✗ User ${userId} disconnected from room: ${ws.roomId}`);
+        
         rooms.leaveRoom(ws.roomId, userId);
         delete users[userId];
-        broadcast({ type: 'user-left', userId }, ws.roomId);
+        
+        broadcast({ 
+            type: 'user-left', 
+            userId 
+        }, ws.roomId);
+        
+        console.log(`Remaining users: ${Object.keys(users).length}`);
     });
 
     ws.on('error', function(error) {
@@ -135,15 +152,32 @@ wss.on('connection', function connection(ws) {
     });
 });
 
+// Heartbeat interval to detect dead connections
+const heartbeatInterval = setInterval(() => {
+    wss.clients.forEach((ws) => {
+        if (ws.isAlive === false) {
+            console.log(`Terminating dead connection: ${ws.userId}`);
+            return ws.terminate();
+        }
+        ws.isAlive = false;
+        ws.ping();
+    });
+}, 30000);
+
+wss.on('close', () => {
+    clearInterval(heartbeatInterval);
+});
+
 process.on('SIGTERM', () => {
     console.log('SIGTERM received, closing server...');
+    clearInterval(heartbeatInterval);
     server.close(() => {
         console.log('Server closed');
         process.exit(0);
     });
 });
 
-// ✅ FIXED: Listen on all interfaces for Render
+// ✅ FIXED: Listen on all interfaces for production
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`
