@@ -1,0 +1,16 @@
+{
+  "name": "collaborative-canvas",
+  "version": "1.0.0",
+  "description": "Real-Time Collaborative Drawing Canvas with Room Support",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.13.0"
+  },
+  "keywords": ["canvas", "real-time", "websocket", "collaborative", "nodejs"],
+  "author": "Your Name",
+  "license": "MIT"
+}

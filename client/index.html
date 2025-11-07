@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Drawing Canvas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>🖌️ Collaborative Drawing Canvas</h1>
+    
+    <div id="room-info">
+        <span id="current-room">Room: <strong>Loading...</strong></span>
+        <button id="change-room">📍 Change Room</button>
+    </div>
+    
+    <div id="stats">
+        <span id="fps">FPS: --</span>
+        <span id="latency">Latency: --ms</span>
+        <span id="paths-count">Paths: 0</span>
+    </div>
+    
+    <div id="toolbar">
+        <label for="color">Color:</label>
+        <input type="color" id="color" value="#000000">
+        <label for="width">Width:</label>
+        <input type="range" id="width" min="1" max="20" value="3">
+        <button id="eraser">🧽 Eraser</button>
+        <button id="undo">↶ Undo</button>
+        <button id="redo">↷ Redo</button>
+        <button id="clear">🗑️ Clear</button>
+    </div>
+    
+    <div id="connection-status" class="connected">● Connected</div>
+    <div id="users"></div>
+    <canvas id="canvas" width="900" height="600"></canvas>
+    
+    <div id="room-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Join a Room</h2>
+            <p>Enter a room name to collaborate with others</p>
+            <input type="text" id="room-input" placeholder="Enter room name (e.g., team-design)">
+            <div class="modal-buttons">
+                <button id="join-room-btn" class="btn-primary">Join Room</button>
+                <button id="cancel-room-btn" class="btn-secondary">Cancel</button>
+            </div>
+            <div class="quick-rooms">
+                <p>Quick Join:</p>
+                <button class="quick-room-btn" data-room="main">Main Room</button>
+                <button class="quick-room-btn" data-room="design">Design Team</button>
+                <button class="quick-room-btn" data-room="dev">Dev Team</button>
+                <button class="quick-room-btn" data-room="private">Private</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+</body>
+</html>
